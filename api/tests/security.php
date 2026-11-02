@@ -68,7 +68,7 @@ function sec_server(string $name, array $env = []): void {
     // would be asserting that the ENDPOINT is broken rather than that the
     // server was not configured for it.
     $new = proc_open(
-        [$php, '-d', 'enable_post_data_reading=0', '-S', "127.0.0.1:$port", TT_BASE . '/api/index.php'],
+        [$php, '-d', 'extension=pdo_sqlite', '-d', 'enable_post_data_reading=0', '-S', "127.0.0.1:$port", TT_BASE . '/api/index.php'],
         [1 => ['file', $nullStream, 'w'], 2 => ['file', $nullStream, 'w']],
         $pipes,
         TT_BASE,

@@ -20,8 +20,12 @@ require_once __DIR__ . '/db.php';
  */
 const TASK_TIMER_STORES = [
     'meta',
+    'task', 'session', 'event',
     'transaction', 'recurring', 'debt', 'debtPayment',
     'category', 'person',
+    'later',
+    'routine', 'routineLog',
+    'page', 'pageItem',
 ];
 
 /**
@@ -106,7 +110,8 @@ function task_timer_push(int $spaceId, array $payload): array {
         'task'    => (int)$cfg['max_tasks_per_space'],
         'session' => (int)$cfg['max_sessions_per_space'],
     ];
-    foreach (['transaction', 'recurring', 'debt', 'debtPayment', 'category', 'person'] as $sharedStore) {
+    foreach (['transaction', 'recurring', 'debt', 'debtPayment', 'category', 'person',
+              'later', 'routine', 'page', 'pageItem'] as $sharedStore) {
         $limits[$sharedStore] = $sharedCap;
     }
 

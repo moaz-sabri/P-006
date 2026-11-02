@@ -13,6 +13,17 @@ declare(strict_types=1);
  * Exit code 0 = all green. A failure prints the diff and exits 1.
  */
 
+// Ensure the SQLite PDO driver is available even on PHP builds where it is
+// shipped but disabled by default (see php.ini: `;extension=pdo_sqlite`).
+// Re-exec this script with the extension enabled rather than failing every
+// database-backed assertion with "could not find driver".
+if (!in_array('sqlite', PDO::getAvailableDrivers(), true)) {
+    $reexec = array_merge([PHP_BINARY, '-d', 'extension=pdo_sqlite', __FILE__], array_slice($argv ?? [], 1));
+    $exitCode = 0;
+    system(implode(' ', array_map('escapeshellarg', $reexec)), $exitCode);
+    exit($exitCode);
+}
+
 define('TT_BASE', dirname(__DIR__, 2));
 
 $php = (string)(getenv('PHP_BIN') ?: PHP_BINARY);
@@ -55,8 +66,9 @@ $env = array_merge(getenv(), [
 // this the intake answers 415 and the share tests below would be asserting the
 // wrong thing — that the endpoint is broken, rather than that the server it runs
 // on was not configured for it.
+$serverArgs = array_merge([$php, '-d', 'extension=pdo_sqlite'], ['-d', 'enable_post_data_reading=0', '-S', "127.0.0.1:$port", $script]);
 $proc = proc_open(
-    [$php, '-d', 'enable_post_data_reading=0', '-S', "127.0.0.1:$port", $script],
+    $serverArgs,
     [1 => ['file', $nullStream, 'w'], 2 => ['file', $nullStream, 'w']],
     $pipes,
     TT_BASE,

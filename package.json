@@ -33,7 +33,7 @@
     "scripts": {
         "build:assets": "webpack --mode production",
         "build": "npm run build:assets",
-        "dev": "npm run build:assets && php -d enable_post_data_reading=0 -S 127.0.0.1:8080 -t app docker-router.php",
+        "dev": "npm run build:assets && php -d extension=pdo_sqlite -d enable_post_data_reading=0 -S 127.0.0.1:8080 -t app docker-router.php",
         "test": "npm run test:client && npm run check:i18n && npm run test:api",
         "test:client": "node --test tests/*.test.mjs",
         "check:i18n": "node tools/check-i18n.mjs",
