@@ -84,11 +84,25 @@ function getDeviceId() {
 
 function randomId(len = 8) {
     const alphabet = "abcdefghijklmnopqrstuvwxyz0123456789";
-    const arr = typeof crypto !== "undefined" && crypto.getRandomValues
-        ? crypto.getRandomValues(new Uint8Array(len))
-        : Array.from({ length: len }, () => Math.floor(Math.random() * 256));
+    const base = alphabet.length;
+    const max = Math.floor(256 / base) * base;
     let out = "";
-    for (let i = 0; i < len; i++) out += alphabet[arr[i] % alphabet.length];
+
+    if (typeof crypto !== "undefined" && crypto.getRandomValues) {
+        while (out.length < len) {
+            const arr = crypto.getRandomValues(new Uint8Array(len - out.length));
+            for (let i = 0; i < arr.length && out.length < len; i++) {
+                const v = arr[i];
+                if (v >= max) continue;
+                out += alphabet[v % base];
+            }
+        }
+        return out;
+    }
+
+    for (let i = 0; i < len; i++) {
+        out += alphabet[Math.floor(Math.random() * base)];
+    }
     return out;
 }
 
